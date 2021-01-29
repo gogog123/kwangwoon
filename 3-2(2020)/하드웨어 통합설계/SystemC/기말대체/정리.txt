@@ -1,0 +1,22 @@
+하통설 term project 해야할일
+
+3개의 가산기를 SystemC를 이용하여 상위수준 모델링을한다.
+3개의 가산기는 RCA(ripple carry adder), CLA(carry look ahead adder), CSA(carry select adder)이다.
+각 가산기의 구조를 이해하고 가산기마다 clock cycle delay를 모델링하여 실제 모듈의 동작을 모방한다.
+이번 프로젝트에서 회로의 딜레이는 FA(full adder)가 연산하는 시간을 1cycle로 가정한다.
+또한 SystemC 시뮬레이션의 cycle period는 1ns로 정한다. 
+
+1. 3개의 가산기(RCA, CLA, CSA)의 구조를 설명하시오.
+	3개의 가산기 구조를 설명하며 delay를 제시
+	프로젝트 보고서에 타당한 이유로 delay 설명
+
+2. 3개의 가산기의 delay를 모델링하여 32bit 가산기를 구현하시오.
+	가산기 모듈은 2장의 입출력 port에 맞춰 구현
+
+3. 제시된 TB 모듈을 이용해 adder를 검증한시오
+	TB 모듈의 동작과 port는 3장에 기술된 내용에 따라 구현
+
+
+32-bits CLA와 32-bits RCA의 크기 속도 비교
+CLA는 RCA가 계산이 완료될 때까지의 시간이 많이 걸리는 단점을 보완하기 위해 모든 올림수가 동시에 구해져 계산시간을 단축시키는 가산기이다. n-bits RCA는 full adder를 n개 연결시켜 만드는 가산기인데 여기서 n이 커질수록 full adder 연결사이에서 delay가 발생하게 되어 연산속도가 더 느려 진다. CLA는 Carry만 계산해주는 carry look-ahead block이 존재하면서 carry를 앞서 보면서 계산할 수 있어 속도가 빨라지게 된다.  
+위에서 실험에서 Fmax summary를 통해 CLA는 149.21MHz, RCA는 83.92MHz인 것을 확인한다. Fmax는 주기랑 반비례하므로 32-bits CLA와 32-bits RCA의 크기 속도를 비교할 수 있게 된다.
