@@ -1,6 +1,0 @@
-﻿  main.cpp
-C:\Users\sejung\Desktop\3학년 2학기\하드웨어소프트웨어통합설계\과제_HW,SW\기말\과제1\systemc-2.3.3\src\sysc\packages\boost\utility\string_view.hpp(1,1): warning C4819: 현재 코드 페이지(949)에서 표시할 수 없는 문자가 파일에 들어 있습니다. 데이터가 손실되지 않게 하려면 해당 파일을 유니코드 형식으로 저장하십시오.
-  Unknown compiler version - please run the configure tests and report the results
-C:\Users\sejung\Desktop\3학년 2학기\하드웨어소프트웨어통합설계\과제_HW,SW\기말\FIR\SYSTEM_wHS\SYSTEM_wHS\tb_whs.h(55,2): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-C:\Users\sejung\Desktop\3학년 2학기\하드웨어소프트웨어통합설계\과제_HW,SW\기말\FIR\SYSTEM_wHS\SYSTEM_wHS\tb_whs.h(56,16): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-systemc.lib(sc_report_handler.obj) : fatal error LNK1112: 'x86' 모듈 컴퓨터 종류가 'x64' 대상 컴퓨터 종류와 충돌합니다.
