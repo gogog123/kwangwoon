@@ -1,0 +1,42 @@
+ARM에는 floating point를 해주는 instruction이 존재하지 않는다. 
+때문에 floationg point가 입력되었을 때 해당 연산을 수행시켜주는 assembly code가 필요하다.
+floating point의 adder를 구현하여 floating point의 덧셈과 뺄셈에 대하여 알아보자.
+normalize과정에서 어떤경우에는 right로, 어떤경우에는 left로 shift되는지를 고려하며 코드를 작성하여 보자.
+
+converting to binary
+fixed-point : the binary point is fixed
+floating-point : the binary point floats to the right of the most
+folatiog-point(부동소수점) : 
+IEEE 754 floation point standard
+precisions
+single precision (32bit) : e=8, m=23
+double precision (64bit) : e=11, m=52
+
+sign bit 음수 양수
+exponent bits(거듭제곱)
+fraction bits (분수)
+express above number in hexadecimal
+
+1. 부호가 같을 경우
+bit data를 각 숫자에 대해서 추출
+mantissa 형태 앞에 1을 붙임
+exponent를 비교 - 두 floation point의 exponent의 차이 값을 구한다. |Exponent1-exponent2| = shift num
+shift num이 0이 아닌 경우 - exponent값이 작은 값의 mantissa 값을 shift num만큼 오른쪽으로 shift
+각 mantissa값을 더해 줌
+mantissa값을 normalize 해줌
+수정이 완료된 mantissa값과 exponent값을 사용하여 결과를 도출
+s=두 floating point의 sign bit
+exponent = normalize result exponent +127
+
+
+2. 부호가 다를 경우
+bit data를 각 숫자에 대해서 추출
+mantissa형태 앞에 1을 붙임
+exponent를 비교- 두 floating point의 exponent의 차이 값 구함. |exponent1-exponent2| = shift num
+shift num이 0이 아닌 경우 exponent 값이 작은 값의 mantissa 값을 shift num만큼 오른쪽으로 shift
+mantissa값을 큰 값에서 작은 값을 빼 줌
+mantissa값을 normalize 해줌
+수정이 완료된 mantissa값과 exponent값을 사용하여 결과를 도출
+s = 두 floating point 중 절대값이 큰 값의 sign bit
+exponent = nornalize result exponent + 127
+
