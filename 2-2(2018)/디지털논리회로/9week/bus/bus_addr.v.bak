@@ -1,0 +1,6 @@
+module bus_addr();
+input
+input
+output
+
+endmodule 

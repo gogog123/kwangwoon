@@ -1,0 +1,124 @@
+module slave(M_din,S_address,S_din,S_sel,S_wr,adder_op_done,clk,reset_n,result,fifo0_data_count,fifo1_data_count,
+            S_dout,adder_op_start,m_interrupt,op_clear,multi_op_start,multiplicand,multiplicand_we,multiplier,multiplier_we,rAddr);
+// slave module            
+input [31:0] M_din,S_din,result; // input variable
+input [7:0] S_address; // input variable
+input S_sel,S_wr,clk,reset_n,adder_op_done; // input variable
+input [3:0] fifo0_data_count,fifo1_data_count; // input variable
+output [31:0] S_dout;
+output m_interrupt;
+wire m_interrupt;
+wire [31:0] S_dout;
+output reg [31:0] multiplicand,multiplier; // output variable
+output reg adder_op_start,multi_op_start,op_clear,multiplicand_we,multiplier_we; // output variable
+output reg [2:0] rAddr; // output variable
+reg [2:0] next_rAddr;
+reg s_interrupt; // wire variable
+//reg [31:0] S_dout; // wire variable
+
+reg mc_we; // wire variable
+reg mp_we;// enable set
+reg multi_start;
+reg adder_start; // start variable
+reg clear; // clear signal set
+
+always@(posedge clk or negedge reset_n)
+begin
+if(reset_n==1'b0) begin // reset
+      multiplicand<=32'b0;
+      multiplicand_we<=1'b0;
+      multiplier<=32'b0;
+      multiplier_we<=1'b0;
+      multi_op_start<=1'b0; // reset_n set
+      adder_op_start<=1'b0; // reset
+      op_clear<=1'b0; // reset
+      rAddr<=3'b0;   
+   end
+else begin // else case
+      multiplicand<=M_din;
+      multiplicand_we<=mc_we;
+      multiplier<=M_din;
+      multiplier_we<=mp_we;
+      multi_op_start<=multi_start; // else case is start
+      adder_op_start<=adder_start; // else case
+      op_clear<=clear; // clear pass
+      rAddr<=next_rAddr; 
+   end
+   
+
+end
+
+always@(*)
+begin
+case(S_address)
+8'b00000000 : begin
+            mc_we<=(S_sel==1'b0)?1'b0:((fifo1_data_count < 4'b1000)?S_wr:1'b0); // enable se
+            mp_we<=1'b0;
+ //           s_interrupt<=s_interrupt; // value maintenance
+            multi_start<=1'b0;
+            adder_start<=1'b0;
+            clear<=1'b0;
+            end
+8'b00000001 : begin
+            mc_we<=1'b0;
+            mp_we<=(S_sel==1'b0)?1'b0:((fifo0_data_count < 4'b1000)?S_wr:1'b0); 
+ //           s_interrupt<=s_interrupt; // value maintenance
+            multi_start<=1'b0;
+            adder_start<=1'b0;
+            clear<=1'b0;
+            end
+8'b00000010 : begin
+            mc_we<=1'b0;
+            mp_we<=1'b0;
+            s_interrupt<=(S_sel==1'b0)?1'b0:((S_wr==1'b1)?((S_din==1'b1)?1'b1:1'b0):1'b0); // enable signal come in
+            multi_start<=1'b0;
+            adder_start<=1'b0;
+            clear<=1'b0;
+            end
+8'b00000011 : begin
+            mc_we<=1'b0;
+            mp_we<=1'b0;
+      //      s_interrupt<=s_interrupt; // value maintenance
+            multi_start<=(S_sel==1'b0)?1'b0:((S_wr==1'b1)?((S_din==1'b1)?1'b1:1'b0):1'b0); // start set
+            adder_start<=1'b0;
+            clear<=1'b0;
+            end            
+8'b00000100 : begin
+            mc_we<=1'b0;
+            mp_we<=1'b0;
+      //      s_interrupt<=s_interrupt; // value maintenance
+            multi_start<=1'b0;
+            adder_start<=(S_sel==1'b0)?1'b0:((S_wr==1'b1)?((S_din==1'b1)?1'b1:1'b0):1'b0); // start variable
+            clear<=1'b0;
+            end   
+8'b00000101 : begin
+            mc_we<=1'b0;
+            mp_we<=1'b0;
+    //        s_interrupt<=s_interrupt; // value maintenance
+            multi_start<=1'b0;
+            adder_start<=1'b0;
+            clear<=(S_sel==1'b0)?1'b0:((S_wr==1'b1)?((S_din==1'b1)?1'b1:1'b0):1'b0); // clear signal set
+            end
+8'b00000110 : begin
+            mc_we<=1'b0;
+            mp_we<=1'b0;
+     //       s_interrupt<=s_interrupt; // value maintenance
+            multi_start<=1'b0;
+            adder_start<=1'b0;
+            clear<=1'b0;
+            end            
+default : begin
+         mc_we<=1'b0;
+         mp_we<=1'b0;
+  //       s_interrupt<=1'bx; // value maintenance
+         multi_start<=1'b0;
+         adder_start<=1'b0;
+         clear<=1'b0;
+         end
+	endcase
+end
+
+assign S_dout=result; // S_dout assign
+assign m_interrupt=s_interrupt & adder_op_done; // m_interrupt signal assign
+
+endmodule

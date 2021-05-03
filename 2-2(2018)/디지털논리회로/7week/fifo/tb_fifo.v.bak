@@ -1,0 +1,13 @@
+`timescale 1ns/100ps
+
+module tb_fifo;
+reg
+
+module fifo(clk,reset_n,rd_en,wr_en,d_in,d_out,data_count,full,empty,wr_ack,wr_err,rd_ack,rd_err);
+//top module of fifo 
+input clk, reset_n, rd_en, wr_en; //rd_en:write enalble, wr_en:write address
+input [31:0] d_in; //read address
+output [31:0] d_out; //read data
+output full, empty; //data full, empty signal
+output wr_ack, wr_err, rd_ack, rd_err;
+output [3:0] data_count; //data count vector 

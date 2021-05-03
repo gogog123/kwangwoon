@@ -1,0 +1,8 @@
+module fa_v2(a,b,ci,s);
+input a,b,ci;
+output s;
+wire sm;
+_xor U0_xor2(.a(a),.b(b),.y(sm));
+_xor U1_xor2(.a(sm),.c(c),.y(s));
+
+endmodule 

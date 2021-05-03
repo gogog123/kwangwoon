@@ -1,0 +1,233 @@
+module adder_cal(din,state,count,result,next_result); // adder cal logic module
+input [1:0] state; // input variable
+input [1:0] count; // input variable
+input [31:0] result,din; // input variable
+output reg [31:0] next_result; // output variable
+
+wire [31:0] addition; // wire variable
+
+parameter IDLE =2'b00; // state IDLE
+parameter EXEC =2'b01; // state EXEC
+parameter OUT  =2'b10;  // state OUT
+parameter DONE =2'b11; // state DONE
+
+always@(state or count or result or din or addition) // always execution when satisfy condition
+begin
+case(state) // case of state
+IDLE : next_result<=32'b0; // IDLE
+
+EXEC : begin // EXEC
+		case(count)
+		2'b00 : next_result<=result;
+		2'b01 : next_result<=din;
+		2'b10 : next_result<=addition; // result of two inputs addition
+		default : next_result<=32'bx;
+		endcase
+		end
+OUT : next_result<= result; // result nochange, OUT state
+
+DONE : next_result<= result; // result nochange, DONE state
+		 
+default : next_result<=32'bx; // default
+endcase 
+end
+
+cla32 U0_cla32(.a(result),.b(din),.ci(1'b0),.s(addition),.co()); // cla for two inputs addition
+endmodule
+
+module adder_ns(fifo_data_count,op_start,op_clear,wAddr,count,state,next_state,next_count,next_wAddr);
+//next state module
+input [2:0] wAddr; // input variable
+input op_start,op_clear; // input variable
+input [3:0] fifo_data_count; // input variable
+input[1:0] state; // 2bit input variable
+input [1:0] count; // 2bit input variable
+
+output reg [1:0] next_state; // 2bit output reg variable
+output reg [1:0] next_count; // 2bit output reg variable
+output reg [2:0] next_wAddr; // 3bit output reg variable
+
+parameter IDLE =2'b00; // state IDLE
+parameter EXEC =2'b01; // state EXEC
+parameter OUT  =2'b10;  // state OUT
+parameter DONE =2'b11; // state DONE
+// when input variable come in
+
+always@(op_clear or op_start or state or count or fifo_data_count or wAddr) // combinational logic
+begin
+case(state) // condition
+IDLE : 
+begin
+if(op_clear==1'b1) begin // clear come in
+		next_state<=IDLE; // next state set
+		next_count<=2'b00; // next count set
+		next_wAddr<=3'b0;
+		end
+else if(op_start==1'b0) begin // start come in
+		next_state<=state; // next state set
+		next_count<=2'b00; // next count set
+		next_wAddr<=3'b0;
+		end
+else begin // else
+		next_state<=EXEC; // exec state come in
+		next_count<=2'b0;
+		next_wAddr<=wAddr;
+		end
+end
+
+EXEC : // EXEC state
+begin
+if(op_clear==1'b1) begin // clear set
+		next_state<=IDLE; // next state set
+		next_count<=2'b00; // next count set
+		next_wAddr<=3'b0;
+		end
+else if(count==2'b10)begin // end calculate
+		next_state<=OUT; // next state set
+		next_count<=count; // next count set
+		next_wAddr<=wAddr;
+		end
+else begin // calculating
+		next_state<=EXEC; // next state set
+		next_count<=count+2'b01; // next count set
+		next_wAddr<=wAddr;
+	  end
+end
+
+OUT : // OUT state
+begin
+		if(op_clear==1'b1) begin // clear set
+		next_state<=IDLE; // next state set
+		next_count<=2'b00; // next count set
+		next_wAddr<=3'b0;
+		end
+		else if(fifo_data_count==4'b0000) begin // fifo empty
+		next_state<=DONE; // done state come in
+		next_count<=2'b0; // reset
+		next_wAddr<=wAddr;
+		end
+		else begin
+		next_state<=IDLE; // next state set
+		next_count<=2'b00; // next count set
+		next_wAddr<=wAddr+3'b001; // address increasement 
+		end
+end
+
+DONE : // DONE state
+begin
+if(op_clear==1'b1) begin // clear set
+		next_state<=IDLE; // next state set
+		next_count<=2'b00; // next_count set
+		next_wAddr<=3'b0; // next address set
+		end
+else if(op_start==1'b1) begin // clear set
+		next_state<=DONE; // next state set
+		next_count<=2'b00; // next_count set
+		next_wAddr<=wAddr; // next address set
+		end
+else begin // change next state
+		next_state<=IDLE; // next state set
+		next_count<=2'b00; // next_count set
+		next_wAddr<=wAddr; // next address set
+		end
+end
+
+default : begin // default state
+		next_state<=2'bx; // next state set
+		next_count<=2'bx; // next_count set
+		next_wAddr<=3'bx;
+	  end
+endcase
+
+
+end
+endmodule
+
+module adder_out(state,count,result,out_result,fifo_re,op_done,RF_we); // adder output logic
+input [1:0] state; // 2bit input variable
+input [1:0] count; // 2bit input variable
+input [31:0] result; // 32bit input variable
+output reg op_done,fifo_re,RF_we; // output variable
+output reg [31:0] out_result; // 2bit output variable
+
+parameter IDLE =2'b00; // IDLE state
+parameter EXEC =2'b01; // EXEC state
+parameter OUT  =2'b10; // OUT state
+parameter DONE =2'b11; // DONE state
+
+always@(state or result or count) // always condition
+begin 
+case(state) //case condition
+IDLE : begin // IDLE state
+		fifo_re<=1'b0; // IDLE state output
+		RF_we<=1'b0; // IDLE state output
+		op_done<=1'b0; // IDLE state output
+		out_result<=result; // IDLE state output
+		end
+EXEC : begin  // EXEC state output
+		if(count==2'b10) // second inputting
+		begin
+		RF_we<=1'b1; // fifo read
+		fifo_re<=1'b0;
+		end
+		else // first inputting
+		begin
+		fifo_re<=1'b1; // fifo read
+		RF_we=1'b0;
+		end
+		
+		op_done<=1'b0;
+		out_result<=result;
+		end
+OUT : begin // OUT state
+		fifo_re<=1'b0;
+		RF_we<=1'b1; // fifo write
+		op_done<=1'b0; // EXEC state output
+		out_result<=result;
+		end
+DONE : begin // DONE state
+		fifo_re<=1'b0;
+		RF_we<=1'b0;
+		op_done<=1'b1; // DONE state output
+		out_result<=result;
+		end
+default : begin // default state
+		fifo_re<=1'bx;
+		RF_we<=1'bx;
+		op_done<=1'bx; // default state output
+		out_result<=32'bx;
+		end
+endcase
+end
+
+endmodule
+
+module adder(din,op_start,clk,fifo_data_count,op_clear,reset_n,RF_we,op_done,out_result,fifo_re,wAddr); // Adder module
+input clk,reset_n,op_clear,op_start; // input variable
+input [3:0] fifo_data_count; // input variable
+input [31:0] din; // input variable
+output op_done, fifo_re,RF_we; // output variable
+output [2:0] wAddr; // output variable
+output [31:0] out_result; // output variable
+
+wire [1:0] state, next_state,count,next_count; // wire variable
+wire [31:0] result,next_result; // wire variable
+wire [2:0] next_wAddr; // wire variable
+// flip-flop set
+_dff_2_r U0_dff_2_r(.clk(clk),.reset_n(reset_n),.d(next_count),.q(count));
+_dff_2_r U1_dff_2_r(.clk(clk),.reset_n(reset_n),.d(next_state),.q(state));
+_dff_3_r U2_dff_3_r(.clk(clk),.reset_n(reset_n),.d(next_wAddr),.q(wAddr));
+_dff_32_r U3_dff_32_r(.clk(clk),.reset_n(reset_n),.d(next_result),.q(result));
+
+// adder state,cal,out logic module set
+adder_ns U4_adder_ns(.fifo_data_count(fifo_data_count),.op_start(op_start),.op_clear(op_clear),.wAddr(wAddr),
+.count(count),.state(state),.next_state(next_state),.next_count(next_count),.next_wAddr(next_wAddr));
+
+adder_cal U5_adder_cal(.din(din),.state(state),.count(count),.result(result),.next_result(next_result));
+
+adder_out U6_adder_out(.state(state),.count(count),.result(result),.out_result(out_result),.fifo_re(fifo_re),.op_done(op_done),.RF_we(RF_we));
+
+
+endmodule
+
+

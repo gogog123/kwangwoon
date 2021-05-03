@@ -1,0 +1,13 @@
+module alu4(a, b, op, result, c, n, z, v);
+input [3:0] a,b;
+input [2:0] op;
+output [3:0] result;
+output c,n,z,v;
+
+wire [3:0] w_not_a, w_not_b, w_and, w_or, w_xor, w_xnor, w_add, w_sub;
+wire c3_add, co_add, c3_sub, co_sub;
+
+_inv_4bits U0_inv_4bits();
+_inv_4bits U0_inv_4bits();
+
+endmodule;

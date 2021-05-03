@@ -1,0 +1,98 @@
+module multiplier_out(state,data_count,u,v,x0,x1,multiplicand,multiplier,next_u,next_v,next_x0,next_x1,result,op_done);
+input [1:0] state;
+input [5:0] data_count;
+input u, v, x0;
+input [31:0] x1;
+input [31:0] multiplicand, multiplier;
+wire [31:0] add_u;
+output reg [31:0] next_u, next_v;
+output reg next_x0;
+output reg [31:0] next_x1;
+output reg [63:0] result;
+output reg op_done;
+
+parameter IDLE_STATE = 2'b00;
+parameter EXEC_STATE = 2'b01;
+parameter DONE_STATE = 2'b10;
+//binary encoding state
+
+always @ (u,v,x0,x1,multiplicand,multiplier,state,data_count)
+//always input change
+begin
+case(state)
+IDLE_STATE: begin
+next_data_count = 0;
+op_done = 0;
+add_u = 0;
+next_u = 0;
+next_v = 0;
+next_x0 = 0;
+next_x1 = multiplier;
+result = 0;
+end
+
+EXEC_STATE: begin
+next_data_count = data_count + 6'b000001;
+op_done = 0;
+if(x1[0]==0 && x0==0) begin
+add_u <= u;
+next_u <= {add_u[31],add_u[31:1]};
+next_v <= {add_u[0],v[31:1]};
+next_x0 <= x1[0];
+next_x1 <= {x1[0],x1[31:1]};
+result[63:0]] <= {next_u[31:0],next_v[31:0]};
+end
+
+else if(x1[0]==0 && x0==1) begin
+add_u <= u - multiplicand;
+next_u <= {add_u[31],add_u[31:1]};
+next_v <= {add_u[0],v[31:1]};
+next_x0 <= x1[0];
+next_x1 <= {x1[0],x1[31:1]};
+result[63:0]] <= {next_u[31:0],next_v[31:0]};
+end
+
+else if(x1[0]==1 && x0==0) begin     
+end
+add_u <= u + multiplicand;
+next_u <= {add_u[31],add_u[31:1]};
+next_v <= {add_u[0],v[31:1]};
+next_x0 <= x1[0];
+next_x1 <= {x1[0],x1[31:1]};
+result[63:0]] <= {next_u[31:0],next_v[31:0]};
+
+else begin
+add_u <= u;
+next_u <= {add_u[31],add_u[31:1]};
+next_v <= {add_u[0],v[31:1]};
+next_x0 <= x1[0];
+next_x1 <= {x1[0],x1[31:1]};
+result[63:0]] <= {next_u[31:0],next_v[31:0]};
+end 
+end //EXEC_STATE end 
+
+DONE_STATE: begin
+next_data_count = 0;
+op_done = 1;
+add_u = 0;
+next_u = 0;
+next_v = 0;
+next_x0 = 0;
+next_x1 = multiplier;
+result = 0;
+end 
+
+default: begin
+next_data_count = 6'bx;
+op_done = 1'bx;
+add_u = 32'bx;
+next_u = 32'bx;
+next_v = 32'bx;
+next_x0 = 1'bx;
+next_x1 = 32'bx;
+result = 64'bx;
+end  
+
+endcase
+end
+endmodule

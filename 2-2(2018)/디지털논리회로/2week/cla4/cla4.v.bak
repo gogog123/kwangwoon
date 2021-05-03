@@ -1,0 +1,12 @@
+module cla4(a, b, ci, s, co);
+input [3:0] a, b;
+input ci;
+output [3:0] s;
+output co;
+
+fa_v2 U0_fa_v2(.a(a[0]),.b(b[0]),.ci(ci),.y(s[0]));
+fa_v2 U1_fa_v2(.a(a[1]),.b(b[1]),.ci(c1),.y(s[1]));
+fa_v2 U2_fa_v2(.a(a[2]),.b(b[2]),.ci(c2),.y(s[2]));
+fa_v2 U3_fa_v2(.a(a[3]),.b(b[3]),.ci(c3),.y(s[3]));
+
+endmodule 

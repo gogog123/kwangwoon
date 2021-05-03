@@ -1,0 +1,8 @@
+module multiplier(clk, reset_n, multiplicand, multiplier, op_start, op_clear, result, op_done)
+input clk, reset_n, op_start, op_clear;
+input [31:0] multiplicand, multiplier;
+output op_done;
+output [63:0] result;
+
+
+endmodule 

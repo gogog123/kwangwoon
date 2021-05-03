@@ -1,0 +1,18 @@
+module fifo(clk,reset_n,rd_en,wr_en,din,dout,data_count,full,empty,wr_err,rd_ack,rd_err);
+input clk, reset_n, rd_en, wr_en;
+input [31:0] din;
+output [31:0] dout;
+output full, empty;
+output wr_ack, wr_arr, rd_ack, 
+output [3:0] data_count;
+
+wire [2:0] head, next_head;
+wire [2:0] tail, next_tail;
+wire [2:0] state, next_state;
+wire [3:0] next_data_count;
+wire we, re;
+wire [31:0] to_mux, to_ff;
+
+
+//instance of register file, 4dff, output logic, next state logic, calculate address logic
+endmodule 

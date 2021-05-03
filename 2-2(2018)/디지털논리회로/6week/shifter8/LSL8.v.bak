@@ -1,0 +1,10 @@
+module LSL8(d_in, shamt, d_out);
+input [7:0] d_in;
+input [1:0] shamt;
+output [7:0] d_out;
+
+mx4 U0_mx4(.y(d_out[0]),.d0(d_in[0]),.d1(1'b0),.d2(1'b0),.d3(1'b0),.s(shamt[1:0]));
+
+
+module mx4(y, d0, d1, d2, d3, s);
+endmodule 
